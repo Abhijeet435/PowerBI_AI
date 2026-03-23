@@ -1,0 +1,113 @@
+tables:
+  - name: SALES_ORDER_HEADER
+    schema: SALES
+    database: ADVENTUREWORKS
+    columns:
+      - name: CHANNEL
+        type: VARCHAR
+      - name: SALESORDERLINEKEY
+        type: NUMBER
+      - name: SALES_ORDER_ID
+        type: VARCHAR
+      - name: SALES_ORDER_LINE
+        type: NUMBER
+    relationships:
+      - join: SALES_ORDER_DETAIL
+        on: SALESORDERLINEKEY
+
+  - name: SALES_ORDER_DETAIL
+    schema: SALES
+    database: ADVENTUREWORKS
+    columns:
+      - name: SALESORDERLINEKEY
+        type: NUMBER
+      - name: RESELLERKEY
+        type: NUMBER
+      - name: CUSTOMERKEY
+        type: NUMBER
+      - name: PRODUCTKEY
+        type: NUMBER
+      - name: ORDERDATEKEY
+        type: NUMBER
+      - name: DUEDATEKEY
+        type: NUMBER
+      - name: SHIPDATEKEY
+        type: NUMBER
+      - name: SALESTERRITORYKEY
+        type: NUMBER
+      - name: ORDER_QUANTITY
+        type: NUMBER
+      - name: UNIT_PRICE
+        type: NUMBER
+      - name: EXTENDED_AMOUNT
+        type: NUMBER
+      - name: UNIT_PRICE_DISCOUNT_PCT
+        type: NUMBER
+      - name: PRODUCT_STANDARD_COST
+        type: NUMBER
+      - name: TOTAL_PRODUCT_COST
+        type: NUMBER
+      - name: SALES_AMOUNT
+        type: NUMBER
+    relationships:
+      - join: CUSTOMER
+        on: CUSTOMERKEY
+      - join: PRODUCT
+        on: PRODUCTKEY
+      - join: SALES_TERRITORY
+        on: SALESTERRITORYKEY
+
+  - name: CUSTOMER
+    schema: SALES
+    database: ADVENTUREWORKS
+    columns:
+      - name: CUSTOMERKEY
+        type: NUMBER
+      - name: CUSTOMER_ID
+        type: VARCHAR
+      - name: CUSTOMER_NAME
+        type: VARCHAR
+      - name: CITY
+        type: VARCHAR
+      - name: STATE_PROVINCE
+        type: VARCHAR
+      - name: COUNTRY_REGION
+        type: VARCHAR
+      - name: POSTAL_CODE
+        type: VARCHAR
+
+  - name: PRODUCT
+    schema: PRODUCTION
+    database: ADVENTUREWORKS
+    columns:
+      - name: PRODUCTKEY
+        type: NUMBER
+      - name: SKU
+        type: VARCHAR
+      - name: PRODUCT_NAME
+        type: VARCHAR
+      - name: STANDARD_COST
+        type: NUMBER
+      - name: COLOR
+        type: VARCHAR
+      - name: LIST_PRICE
+        type: NUMBER
+      - name: MODEL
+        type: VARCHAR
+      - name: SUBCATEGORY
+        type: VARCHAR
+      - name: CATEGORY
+        type: VARCHAR
+
+  - name: SALES_TERRITORY
+    schema: SALES
+    database: ADVENTUREWORKS
+    columns:
+      - name: SALESTERRITORYKEY
+        type: NUMBER
+      - name: REGION
+        type: VARCHAR
+      - name: COUNTRY
+        type: VARCHAR
+      - name: GROUP
+        type: VARCHAR

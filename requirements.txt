@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+langchain
+langchain-groq
+openai
+snowflake-connector-python
+pyyaml
+python-dotenv
+pandas

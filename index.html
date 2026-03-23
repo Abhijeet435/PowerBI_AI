@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQuery — AI Data Intelligence</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080c14;
+            --surface: #0e1420;
+            --surface2: #141c2e;
+            --border: rgba(99, 179, 237, 0.12);
+            --accent: #63b3ed;
+            --accent2: #9f7aea;
+            --accent3: #68d391;
+            --text: #e2e8f0;
+            --text-muted: #64748b;
+            --text-dim: #94a3b8;
+            --danger: #fc8181;
+            --glow: rgba(99, 179, 237, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background grid effect */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(99,179,237,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99,179,237,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Ambient glow blobs */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+        .blob-1 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(99,179,237,0.2), transparent);
+            top: -100px; left: -100px;
+        }
+        .blob-2 {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(159,122,234,0.15), transparent);
+            bottom: 100px; right: -100px;
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 56px;
+        }
+
+        .logo-mark {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            box-shadow: 0 0 24px rgba(99,179,237,0.3);
+        }
+
+        .logo-text {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 22px;
+            letter-spacing: -0.5px;
+            color: var(--text);
+        }
+
+        .logo-text span {
+            color: var(--accent);
+        }
+
+        .header-badge {
+            margin-left: auto;
+            padding: 6px 12px;
+            background: rgba(104, 211, 145, 0.1);
+            border: 1px solid rgba(104, 211, 145, 0.25);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--accent3);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-family: 'DM Mono', monospace;
+        }
+
+        /* Hero section */
+        .hero {
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: clamp(32px, 5vw, 52px);
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+            margin-bottom: 16px;
+        }
+
+        .hero h1 .line2 {
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            color: var(--text-dim);
+            font-size: 16px;
+            font-weight: 300;
+            max-width: 520px;
+            line-height: 1.7;
+        }
+
+        /* Search area */
+        .search-area {
+            margin-bottom: 32px;
+        }
+
+        .search-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        .input-wrap {
+            flex: 1;
+            position: relative;
+        }
+
+        .input-wrap::before {
+            content: '>';
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: 'DM Mono', monospace;
+            color: var(--accent);
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 16px 18px 16px 40px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: rgba(99,179,237,0.5);
+            background: var(--surface2);
+            box-shadow: 0 0 0 3px rgba(99,179,237,0.08), 0 0 24px rgba(99,179,237,0.1);
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--text-muted);
+        }
+
+        .ask-btn {
+            padding: 16px 28px;
+            background: linear-gradient(135deg, var(--accent), #4299e1);
+            border: none;
+            border-radius: 12px;
+            color: #080c14;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            box-shadow: 0 4px 20px rgba(99,179,237,0.3);
+        }
+
+        .ask-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 28px rgba(99,179,237,0.4);
+        }
+
+        .ask-btn:active { transform: translateY(0); }
+
+        .ask-btn:disabled {
+            background: var(--surface2);
+            color: var(--text-muted);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Suggestion chips */
+        .chips-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 40px;
+        }
+
+        .chip {
+            padding: 7px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .chip:hover {
+            border-color: rgba(99,179,237,0.4);
+            color: var(--accent);
+            background: rgba(99,179,237,0.06);
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 32px;
+        }
+
+        /* Loading state */
+        .loading-state {
+            display: none;
+            padding: 48px;
+            text-align: center;
+        }
+
+        .loading-state.active { display: block; }
+
+        .pulse-ring {
+            display: inline-block;
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            border: 2px solid rgba(99,179,237,0.2);
+            border-top-color: var(--accent);
+            animation: spin 0.9s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-text {
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .loading-steps {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: 'DM Mono', monospace;
+        }
+
+        .step-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+
+        .step.active .step-dot { background: var(--accent); animation: blink 1s infinite; }
+        .step.done .step-dot { background: var(--accent3); }
+        .step.active { color: var(--accent); }
+        .step.done { color: var(--accent3); }
+
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        /* Error */
+        .error-box {
+            display: none;
+            padding: 16px 20px;
+            background: rgba(252,129,129,0.08);
+            border: 1px solid rgba(252,129,129,0.2);
+            border-radius: 12px;
+            color: var(--danger);
+            font-size: 13px;
+            margin-bottom: 24px;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .error-box.active { display: flex; gap: 10px; align-items: flex-start; }
+
+        /* Results */
+        #results { display: none; }
+        #results.active { display: block; animation: fadeUp 0.4s ease; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stats row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+        }
+
+        .stat-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        /* Chart card */
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2), transparent);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        .card-meta {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 360px;
+        }
+
+        /* SQL card */
+        .sql-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .sql-header {
+            padding: 14px 20px;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sql-title {
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sql-dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .sql-dots span {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+        }
+
+        .sql-dots span:nth-child(1) { background: #fc8181; }
+        .sql-dots span:nth-child(2) { background: #f6ad55; }
+        .sql-dots span:nth-child(3) { background: #68d391; }
+
+        .copy-btn {
+            padding: 5px 12px;
+            background: rgba(99,179,237,0.1);
+            border: 1px solid rgba(99,179,237,0.2);
+            border-radius: 6px;
+            color: var(--accent);
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(99,179,237,0.2);
+        }
+
+        .sql-body {
+            padding: 20px 24px;
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            color: #a5d8ff;
+            white-space: pre-wrap;
+            word-break: break-all;
+            line-height: 1.8;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        /* SQL syntax highlight colors */
+        .kw { color: #c084fc; }
+        .tb { color: #67e8f9; }
+        .fn { color: #86efac; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 48px;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        footer span { color: var(--accent); }
+
+        @media (max-width: 600px) {
+            .stats-row { grid-template-columns: 1fr; }
+            .search-row { flex-direction: column; }
+            .loading-steps { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="wrapper">
+        <header>
+            <div class="logo-mark">⬡</div>
+            <div class="logo-text">M<span>Query</span></div>
+            <div class="header-badge">● Live</div>
+        </header>
+
+        <div class="hero">
+            <h1>
+                Ask your data<br>
+                <span class="line2">anything.</span>
+            </h1>
+            <p>Type a business question in plain English. AI reads your Snowflake schema, writes the SQL, and returns the answer as a chart.</p>
+        </div>
+
+        <div class="search-area">
+            <span class="search-label">// Natural language query</span>
+            <div class="search-row">
+                <div class="input-wrap">
+                    <input
+                        type="text"
+                        id="question"
+                        placeholder="Top 5 products by total sales amount..."
+                        onkeypress="if(event.key==='Enter') askQuestion()"
+                        autocomplete="off"
+                    />
+                </div>
+                <button class="ask-btn" onclick="askQuestion()" id="sendBtn">Run Query →</button>
+            </div>
+        </div>
+
+        <span class="chips-label">// Try these</span>
+        <div class="chips">
+            <div class="chip" onclick="fillQuestion(this)">Top 5 products by total sales</div>
+            <div class="chip" onclick="fillQuestion(this)">Total sales by country region</div>
+            <div class="chip" onclick="fillQuestion(this)">Total sales by product category</div>
+            <div class="chip" onclick="fillQuestion(this)">Top 10 customers by sales amount</div>
+            <div class="chip" onclick="fillQuestion(this)">Sales amount by region</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Loading -->
+        <div class="loading-state" id="loading">
+            <div class="pulse-ring"></div>
+            <div class="loading-text">Processing your query...</div>
+            <div class="loading-steps">
+                <div class="step" id="step1">
+                    <div class="step-dot"></div> Reading schema
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-dot"></div> Generating SQL
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-dot"></div> Querying Snowflake
+                </div>
+                <div class="step" id="step4">
+                    <div class="step-dot"></div> Rendering chart
+                </div>
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div class="error-box" id="error">
+            <span>⚠</span>
+            <span id="errorMsg"></span>
+        </div>
+
+        <!-- Results -->
+        <div id="results">
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-label">Rows returned</div>
+                    <div class="stat-value" id="statRows">—</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Columns</div>
+                    <div class="stat-value" id="statCols">—</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Response time</div>
+                    <div class="stat-value" id="statTime">—</div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="dot"></div>
+                        Query Result
+                    </div>
+                    <div class="card-meta" id="chartMeta"></div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>
+
+            <div class="sql-card">
+                <div class="sql-header">
+                    <div class="sql-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <div class="sql-title">generated_query.sql</div>
+                    <button class="copy-btn" onclick="copySQL()">Copy SQL</button>
+                </div>
+                <div class="sql-body" id="sqlBlock"></div>
+            </div>
+        </div>
+
+        <footer>
+            Powered by <span>Groq LLaMA</span> · <span>Snowflake</span> · <span>LangChain</span> — Softude Infotech
+        </footer>
+    </div>
+
+    <script>
+        let chartInstance = null;
+        let currentSQL = '';
+
+        const COLORS = [
+            'rgba(99,179,237,0.85)',
+            'rgba(159,122,234,0.85)',
+            'rgba(104,211,145,0.85)',
+            'rgba(246,173,85,0.85)',
+            'rgba(252,129,129,0.85)',
+            'rgba(99,179,237,0.6)',
+            'rgba(159,122,234,0.6)',
+            'rgba(104,211,145,0.6)',
+            'rgba(246,173,85,0.6)',
+            'rgba(252,129,129,0.6)',
+        ];
+
+        function fillQuestion(el) {
+            document.getElementById('question').value = el.textContent;
+            askQuestion();
+        }
+
+        function setStep(n) {
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById('step' + i);
+                el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+            }
+        }
+
+        async function askQuestion() {
+            const question = document.getElementById('question').value.trim();
+            if (!question) return;
+
+            const startTime = Date.now();
+
+            // Reset UI
+            document.getElementById('loading').className = 'loading-state active';
+            document.getElementById('results').className = '';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('error').className = 'error-box';
+            document.getElementById('sendBtn').disabled = true;
+
+            setStep(1);
+            await sleep(400);
+            setStep(2);
+
+            try {
+                const response = await fetch('http://localhost:8000/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question })
+                });
+
+                setStep(3);
+                const data = await response.json();
+                setStep(4);
+                await sleep(300);
+
+                if (!data.success) {
+                    showError(data.error || 'Something went wrong. Try rephrasing your question.');
+                    return;
+                }
+
+                if (!data.data || data.data.length === 0) {
+                    showError('No data returned. Try a different question.');
+                    return;
+                }
+
+                const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+
+                // Stats
+                document.getElementById('statRows').textContent = data.data.length;
+                document.getElementById('statCols').textContent = data.columns.length;
+                document.getElementById('statTime').textContent = elapsed + 's';
+                document.getElementById('chartMeta').textContent = data.columns[0] + ' vs ' + data.columns[1];
+
+                currentSQL = data.sql;
+                renderChart(data);
+                renderSQL(data.sql);
+
+                document.getElementById('results').style.display = 'block';
+                document.getElementById('results').className = 'active';
+
+            } catch (err) {
+                showError('Cannot connect to API. Make sure uvicorn is running on port 8000.');
+            } finally {
+                document.getElementById('loading').className = 'loading-state';
+                document.getElementById('sendBtn').disabled = false;
+            }
+        }
+
+        function renderChart(data) {
+            const cols = data.columns;
+            const rows = data.data;
+            const labels = rows.map(r => String(r[cols[0]]));
+            const values = rows.map(r => parseFloat(r[cols[1]]) || 0);
+
+            if (chartInstance) chartInstance.destroy();
+
+            Chart.defaults.color = '#64748b';
+            Chart.defaults.font.family = "'DM Mono', monospace";
+
+            const ctx = document.getElementById('myChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: cols[1],
+                        data: values,
+                        backgroundColor: COLORS.slice(0, values.length),
+                        borderColor: 'transparent',
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 700, easing: 'easeOutQuart' },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#64748b',
+                                font: { size: 11 },
+                                boxWidth: 12,
+                                boxHeight: 12
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#0e1420',
+                            borderColor: 'rgba(99,179,237,0.2)',
+                            borderWidth: 1,
+                            titleColor: '#63b3ed',
+                            bodyColor: '#e2e8f0',
+                            padding: 12,
+                            callbacks: {
+                                label: ctx => ` ${Number(ctx.parsed.y).toLocaleString()}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(99,179,237,0.05)' },
+                            ticks: {
+                                color: '#64748b',
+                                maxRotation: 40,
+                                font: { size: 11 }
+                            }
+                        },
+                        y: {
+                            grid: { color: 'rgba(99,179,237,0.05)' },
+                            ticks: {
+                                color: '#64748b',
+                                font: { size: 11 },
+                                callback: val => val >= 1000000
+                                    ? (val/1000000).toFixed(1) + 'M'
+                                    : val >= 1000
+                                    ? (val/1000).toFixed(0) + 'K'
+                                    : val
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderSQL(sql) {
+            // Basic syntax highlighting
+            const highlighted = sql
+                .replace(/\b(SELECT|FROM|JOIN|ON|WHERE|GROUP BY|ORDER BY|LIMIT|SUM|COUNT|AVG|MAX|MIN|AS|AND|OR|NOT|IN|DESC|ASC|INNER|LEFT|RIGHT|OUTER|HAVING|DISTINCT)\b/g, '<span class="kw">$1</span>')
+                .replace(/ADVENTUREWORKS\.\w+\.\w+/g, '<span class="tb">$&</span>');
+            document.getElementById('sqlBlock').innerHTML = highlighted;
+        }
+
+        function copySQL() {
+            navigator.clipboard.writeText(currentSQL).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = 'Copy SQL', 2000);
+            });
+        }
+
+        function showError(msg) {
+            document.getElementById('errorMsg').textContent = msg;
+            document.getElementById('error').className = 'error-box active';
+        }
+
+        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+    </script>
+</body>
+</html>
+```
