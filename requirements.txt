@@ -3,7 +3,7 @@ uvicorn
 langchain
 langchain-groq
 openai
-snowflake-connector-python
+snowflake-connector-python[pandas]
 pyyaml
 python-dotenv
 pandas
