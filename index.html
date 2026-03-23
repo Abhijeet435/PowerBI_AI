@@ -744,6 +744,8 @@
         let chartInstance = null;
         let currentSQL = '';
         let chartCounter = 0;
+        let pbiRefreshInterval = null;
+        let pbiUrl = '';
 
         const COLORS = [
             'rgba(99,179,237,0.85)', 'rgba(159,122,234,0.85)',
@@ -754,27 +756,45 @@
         ];
 
         // ── Power BI loader ──────────────────────────────────────────
-        function loadPBIReport() {
-            const url = document.getElementById('pbiUrlInput').value.trim();
-            if (!url) return;
-
-            const wrap = document.getElementById('pbiFrameWrap');
-            // Remove placeholder
-            const placeholder = document.getElementById('pbiPlaceholder');
-            if (placeholder) placeholder.remove();
-
-            // Remove existing iframe
-            const existing = wrap.querySelector('iframe');
-            if (existing) existing.remove();
-
+        function createPBIFrame(url) {
             const iframe = document.createElement('iframe');
-            iframe.src = url;
+            iframe.src = url + (url.includes('?') ? '&' : '?') + '_t=' + Date.now();
             iframe.width = '100%';
             iframe.height = '100%';
             iframe.frameBorder = '0';
             iframe.allowFullscreen = true;
             iframe.style.display = 'block';
-            wrap.appendChild(iframe);
+            return iframe;
+        }
+
+        function refreshPBIFrame() {
+            if (!pbiUrl) return;
+            const wrap = document.getElementById('pbiFrameWrap');
+            const old = wrap.querySelector('iframe');
+            if (old) old.remove();
+            wrap.appendChild(createPBIFrame(pbiUrl));
+        }
+
+        function loadPBIReport() {
+            pbiUrl = document.getElementById('pbiUrlInput').value.trim();
+            if (!pbiUrl) return;
+
+            const wrap = document.getElementById('pbiFrameWrap');
+            const placeholder = document.getElementById('pbiPlaceholder');
+            if (placeholder) placeholder.remove();
+
+            const existing = wrap.querySelector('iframe');
+            if (existing) existing.remove();
+
+            // Clear any existing auto-refresh timer
+            if (pbiRefreshInterval) clearInterval(pbiRefreshInterval);
+
+            wrap.appendChild(createPBIFrame(pbiUrl));
+
+            // Auto-refresh every 15 seconds to pick up streaming data
+            pbiRefreshInterval = setInterval(refreshPBIFrame, 15000);
+
+            document.querySelector('.pbi-pane .pane-title').textContent = 'Power BI Report — auto-refreshing';
         }
 
         // ── Resize handle ────────────────────────────────────────────
@@ -996,6 +1016,11 @@
                 });
 
                 document.getElementById('chatMessages').scrollTop = 99999;
+
+                // Refresh Power BI iframe immediately after query pushes data
+                if (pbiUrl) {
+                    setTimeout(refreshPBIFrame, 2000); // 2s delay to let PBI ingest data
+                }
 
             } catch (err) {
                 loadEl.remove();
