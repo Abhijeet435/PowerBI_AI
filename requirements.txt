@@ -7,3 +7,4 @@ snowflake-connector-python[pandas]
 pyyaml
 python-dotenv
 pandas
+httpx
