@@ -712,7 +712,7 @@
             setStep(2);
 
             try {
-                const response = await fetch('https://powerbi-ai.onrender.com', {
+                const response = await fetch('https://powerbi-ai.onrender.com/query', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ question })
